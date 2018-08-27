@@ -1,0 +1,14 @@
+#ifndef _COLLABCC_CONFIG_H_INCLUDED_
+#define _COLLABCC_CONFIG_H_INCLUDED_
+
+// collabcc version number format:
+//   <major>.<minor>.<patch> <suffix>
+// <suffix> could be:
+//   "stable" "rc" "beta" "alpha" "unstable"
+#define COLLABCC_VERSION_MAJOR              (@COLLABCC_VERSION_MAJOR@)
+#define COLLABCC_VERSION_MINOR              (@COLLABCC_VERSION_MINOR@)
+#define COLLABCC_VERSION_PATCH              (@COLLABCC_VERSION_PATCH@)
+#define COLLABCC_VERSION_SUFFIX             ("@COLLABCC_VERSION_SUFFIX@")
+
+
+#endif // _COLLABCC_CONFIG_H_INCLUDED_

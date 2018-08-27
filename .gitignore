@@ -1,0 +1,12 @@
+
+# Visual Studio files
+/.vs/
+/CMakeBuilds/
+
+# CLion files
+/.idea/
+/cmake-build-*/
+
+# VIM files
+*.swp
+
