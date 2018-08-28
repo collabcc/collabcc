@@ -18,6 +18,11 @@ set(COLLABCC_VERSION_SUFFIX "unstable")
 set(THIRDPARTY_BOOST boost_1_68_0)
 
 
+# Enable C11, C++11
+set(CMAKE_C_STANDARD 11)
+set(CMAKE_CXX_STANDARD 11)
+
+
 # Add source files and 3rd-party directory to include directories
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/${THIRDPARTY_BOOST})

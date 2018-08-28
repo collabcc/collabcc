@@ -6,9 +6,9 @@
 #endif // _COLLABCC_COMMON_COMMON_H_INCLUDED_
 
 
-#ifdef BOOST_COMP_MSVC
+#if BOOST_COMP_MSVC
 #define CPP_NO_INLINE   __declspec(noinline)
-#elif defined(BOOST_COMP_GNUC)
+#elif BOOST_COMP_GNUC
 #define CPP_NO_INLINE   __attribute__((noinline))
 #else
 #define CPP_NO_INLINE

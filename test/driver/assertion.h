@@ -134,9 +134,9 @@ namespace test
 #define TEST_ASSERT_GE(_Left, _Right, ...)  _TEST_ASSERT_COMPARE("TEST_ASSERT_GE", (_Left), (_Right), #_Left, #_Right, (::general_comparer<decltype(_Left), decltype(_Right)>::greater_equal()), ##__VA_ARGS__)
 #define TEST_ASSERT_EQ(_Left, _Right, ...)  _TEST_ASSERT_COMPARE("TEST_ASSERT_EQ", (_Left), (_Right), #_Left, #_Right, (::general_comparer<decltype(_Left), decltype(_Right)>::equal_to()), ##__VA_ARGS__)
 #define TEST_ASSERT_NE(_Left, _Right, ...)  _TEST_ASSERT_COMPARE("TEST_ASSERT_NE", (_Left), (_Right), #_Left, #_Right, (::general_comparer<decltype(_Left), decltype(_Right)>::not_equal_to()), ##__VA_ARGS__)
-#define TEST_ASSERT_AND(_Left, _Right, ...) _TEST_ASSERT_COMPARE("TEST_ASSERT_AND", (_Left), (_Right), #_Left, #_Right, (::general_comparer<decltype(_Left), decltype(_Right)>::and()), ##__VA_ARGS__)
-#define TEST_ASSERT_OR(_Left, _Right, ...)  _TEST_ASSERT_COMPARE("TEST_ASSERT_OR", (_Left), (_Right), #_Left, #_Right, (::general_comparer<decltype(_Left), decltype(_Right)>::or()), ##__VA_ARGS__)
-#define TEST_ASSERT_XOR(_Left, _Right, ...) _TEST_ASSERT_COMPARE("TEST_ASSERT_XOR", (_Left), (_Right), #_Left, #_Right, (::general_comparer<decltype(_Left), decltype(_Right)>::xor()), ##__VA_ARGS__)
+#define TEST_ASSERT_AND(_Left, _Right, ...) _TEST_ASSERT_COMPARE("TEST_ASSERT_AND", (_Left), (_Right), #_Left, #_Right, (::general_comparer<decltype(_Left), decltype(_Right)>::logic_and()), ##__VA_ARGS__)
+#define TEST_ASSERT_OR(_Left, _Right, ...)  _TEST_ASSERT_COMPARE("TEST_ASSERT_OR", (_Left), (_Right), #_Left, #_Right, (::general_comparer<decltype(_Left), decltype(_Right)>::logic_or()), ##__VA_ARGS__)
+#define TEST_ASSERT_XOR(_Left, _Right, ...) _TEST_ASSERT_COMPARE("TEST_ASSERT_XOR", (_Left), (_Right), #_Left, #_Right, (::general_comparer<decltype(_Left), decltype(_Right)>::logic_xor()), ##__VA_ARGS__)
 
 #define TEST_ASSERT_STR_LT(_Left, _Right, ...)  _TEST_ASSERT_COMPARE("TEST_ASSERT_STR_LT", (_Left), (_Right), #_Left, #_Right, (::str_comparer::less()), ##__VA_ARGS__)
 #define TEST_ASSERT_STR_LE(_Left, _Right, ...)  _TEST_ASSERT_COMPARE("TEST_ASSERT_STR_LE", (_Left), (_Right), #_Left, #_Right, (::str_comparer::less_equal()), ##__VA_ARGS__)

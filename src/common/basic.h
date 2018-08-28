@@ -29,6 +29,7 @@ static inline bool false_or_indeterminate(const tribool& tb) noexcept
 // unwrap
 //   Type unwrapper, expose "origin" type (cv, ref removed)
 //
+#include <type_traits>
 template <typename T>
 struct unwrap {
     typedef T original_type;
@@ -77,9 +78,9 @@ struct general_comparer
     _DECLARE_COMPARER(greater_equal, >= )
     _DECLARE_COMPARER(equal_to, == )
     _DECLARE_COMPARER(not_equal_to, != )
-    _DECLARE_COMPARER(and, && )
-    _DECLARE_COMPARER(or, || )
-    _DECLARE_COMPARER(xor, ^ )
+    _DECLARE_COMPARER(logic_and, && )
+    _DECLARE_COMPARER(logic_or, || )
+    _DECLARE_COMPARER(logic_xor, ^ )
 #undef _DECLARE_COMPARER
 };
 
