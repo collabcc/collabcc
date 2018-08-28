@@ -7,9 +7,10 @@
 
 #include <cstdarg>
 
+
 namespace common
 {
-#ifndef BUILD_UNITTEST_ASSERTIONS
+#if !BUILD_UNITTEST_ASSERTIONS
     CPP_NO_RETURN
 #endif
     CPP_NO_INLINE
@@ -75,7 +76,7 @@ namespace common
         fwrite(buffer, sizeof(char), len, stderr);
         fflush(stderr);
 
-#ifndef BUILD_UNITTEST_ASSERTIONS
+#if !BUILD_UNITTEST_ASSERTIONS
         exit(1);
 #else
         extern int assertion_failure_count;
@@ -86,27 +87,40 @@ namespace common
 
 
 #define ASSERT(_Expr, ...) \
-    do { \
+    (([&]() { \
         if (!(_Expr)) { \
             ::common::Panic("ASSERT(" #_Expr ")", __FILE__, __LINE__, 0, nullptr, ##__VA_ARGS__); \
         } \
-    } while(false)
+    })())
 
-#define UNEXPECTED(...) \
-    do { \
-        ::common::Panic("UNEXPECTED", __FILE__, __LINE__, 0, nullptr, ##__VA_ARGS__); \
-    } while(false)
+#define ASSERT_NOT_NULL(_Expr, ...) \
+    (([&]() { \
+        if ((_Expr) == nullptr) { \
+            ::common::Panic("ASSERT_NOT_NULL(" #_Expr ")", __FILE__, __LINE__, 0, nullptr, ##__VA_ARGS__); \
+        } \
+    })())
+
+#define ASSERT_IS_NULL(_Expr, ...) \
+    (([&]() { \
+        if ((_Expr) != nullptr) { \
+            ::common::Panic("ASSERT_IS_NULL(" #_Expr ")", __FILE__, __LINE__, 0, nullptr, ##__VA_ARGS__); \
+        } \
+    })())
+
+#define PANIC(...) \
+    (([&]() { \
+        ::common::Panic("PANIC", __FILE__, __LINE__, 0, nullptr, ##__VA_ARGS__); \
+    })())
 
 #define UNEXPECTED_REACH_HERE(...) \
-    do { \
+    (([&]() { \
         ::common::Panic("UNEXPECTED_REACH_HERE: should not reach here", __FILE__, __LINE__, 0, nullptr, ##__VA_ARGS__); \
-    } while(false)
+    })())
 
 
 #define _ASSERT_COMPARE(_StrAssert, _Left, _Right, _StrLeft, _StrRight, _Comp, ...) \
-    do { \
-        typename ::unwrap<decltype(_Left)>::cref left_value = (_Left); \
-        typename ::unwrap<decltype(_Right)>::cref right_value = (_Right); \
+    (([&](typename ::unwrap<decltype(_Left)>::cref left_value, \
+         typename ::unwrap<decltype(_Right)>::cref right_value) { \
         if (!((_Comp)(left_value, right_value))) { \
             const std::string left_value_str = ::stringify(left_value); \
             const std::string right_value_str = ::stringify(right_value); \
@@ -115,7 +129,7 @@ namespace common
             }; \
             ::common::Panic(_StrAssert "(" _StrLeft ", " _StrRight ")", __FILE__, __LINE__, ::get_array_size(internal_msgs), internal_msgs, ##__VA_ARGS__); \
         } \
-    } while(false)
+    })((_Left), (_Right)))
 
 #define ASSERT_LT(_Left, _Right, ...)  _ASSERT_COMPARE("ASSERT_LT", (_Left), (_Right), #_Left, #_Right, (::general_comparer<decltype(_Left), decltype(_Right)>::less()), ##__VA_ARGS__)
 #define ASSERT_LE(_Left, _Right, ...)  _ASSERT_COMPARE("ASSERT_LE", (_Left), (_Right), #_Left, #_Right, (::general_comparer<decltype(_Left), decltype(_Right)>::less_equal()), ##__VA_ARGS__)

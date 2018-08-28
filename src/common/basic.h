@@ -142,6 +142,12 @@ static inline typename std::enable_if<
     return std::string(std::forward<T>(value));
 }
 
+template<size_t _Size>
+static inline std::string stringify(const char (&value)[_Size])
+{
+    return std::string(value);
+}
+
 template<typename T>
 static inline typename std::enable_if<
     std::is_same<typename unwrap<T>::type, char>::value,
