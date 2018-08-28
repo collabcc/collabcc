@@ -14,6 +14,13 @@
 
 #include <generated/config.h>
 
+// Use Boost.Predef
+#include <boost/predef.h>
+
 #include "basic.h"
+#include "macros.h"
+
+#include "assertion.h"
+
 
 #endif // _COLLABCC_COMMON_COMMON_H_INCLUDED_

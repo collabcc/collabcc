@@ -11,4 +11,3 @@ _**See [dev](https://github.com/collabcc/collabcc/tree/dev) branch for details.*
 ## License
 
 Licensed under [MIT](./LICENSE) license.
-

@@ -13,8 +13,14 @@ set(COLLABCC_VERSION_PATCH 1)
 set(COLLABCC_VERSION_SUFFIX "unstable")
 
 
-# Add source files directory to include directories
-include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src")
+# Third-party libraries
+# Directory "3rdparty/${THIRDPARTY_XXX}" shall exist
+set(THIRDPARTY_BOOST boost_1_68_0)
+
+
+# Add source files and 3rd-party directory to include directories
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/${THIRDPARTY_BOOST})
 
 
 # Configure config.h and add the destination to include directories
@@ -27,8 +33,10 @@ include_directories("${CMAKE_CURRENT_BINARY_DIR}/cmakein")
 
 # Source files and executables
 set(COMMON_SOURCE_FILES
+    src/common/assertion.h
     src/common/basic.h
     src/common/common.h
+    src/common/macros.h
     src/main.cpp
     "${CMAKE_CURRENT_BINARY_DIR}/cmakein/generated/config.h")
 

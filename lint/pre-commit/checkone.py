@@ -33,6 +33,7 @@ known_executable_filename = set([
 
 
 import codecs
+import io
 import os
 import stat
 import sys
@@ -59,15 +60,16 @@ def check_executable_bit(filepath, filename, fileext, dofix):
 
 
 def check_lines(filepath, filename, fileext, dofix):
-    is_known_text = fileext in known_text_ext or filename in known_text_filename
     is_known_binary = fileext in known_binary_ext or filename in known_binary_filename
     if is_known_binary:
         return True
+
+    is_known_text = fileext in known_text_ext or filename in known_text_filename
     if not is_known_text:
         print("%s: is this text or binary file? Update %s" % (filepath, __file__))
         return False
 
-    with codecs.open(filepath, "r", encoding="utf8") as file:
+    with codecs.open(filepath, "r", encoding="ascii") as file:
         lines = file.readlines()
     success = True
     for ln in range(1, len(lines) + 1):
@@ -83,6 +85,10 @@ def check_lines(filepath, filename, fileext, dofix):
             else:
                 print("%s: line %d: newline charactor is not <LF>" % (filepath, ln))
             success = False
+        else:  # line[-1] == '\n'
+            if len(line) >= 2 and line[-2] == '\r':
+                print("%s: line %d: newline charactor is <CR><LF>" % (filepath, ln))
+                success = False
         line_no_nl = line
         while line_no_nl and line_no_nl[-1] in ('\r', '\n'):
             line_no_nl = line_no_nl[:-1]
