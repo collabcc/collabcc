@@ -1,4 +1,6 @@
-cmake_minimum_required(VERSION 2.8.4 FATAL_ERROR)
+# target_compile_definitions requires CMake 2.8.11
+cmake_minimum_required(VERSION 2.8.11 FATAL_ERROR)
+
 
 project(collabcc C CXX)
 
@@ -19,8 +21,38 @@ set(THIRDPARTY_BOOST boost_1_68_0)
 
 
 # Enable C11, C++11
-set(CMAKE_C_STANDARD 11)
-set(CMAKE_CXX_STANDARD 11)
+# Enable C/C++ 11
+if (CMAKE_VERSION VERSION_LESS 3.1)
+    # Add the C++11 flag, whatever it is
+    include(CheckCXXCompilerFlag)
+    CHECK_CXX_COMPILER_FLAG(-std=c++11 COMPILER_SUPPORTS_CXX11)
+    if (COMPILER_SUPPORTS_CXX11)
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+    else()
+        # TODO: Maybe other flags?
+        message(FATAL_ERROR "The C++ compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Consider using a different C++ compiler.")
+    endif()
+
+    # Add the C11 flag, whatever it is
+    include(CheckCCompilerFlag)
+    CHECK_C_COMPILER_FLAG(-std=c11 COMPILER_SUPPORTS_C11)
+    if (COMPILER_SUPPORTS_C11)
+        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c11")
+    else()
+        # TODO: Maybe other flags?
+        message(FATAL_ERROR "The C compiler ${CMAKE_C_COMPILER} has no C11 support. Consider using a different C compiler.")
+    endif()
+else()
+    # Require C++11 support, prefer ISO C++ over GNU variants,
+    # as relying solely on ISO C++ is more portable.
+    SET(CMAKE_CXX_STANDARD 11)
+    SET(CMAKE_CXX_STANDARD_REQUIRED ON)
+    #SET(CMAKE_CXX_EXTENSIONS OFF)
+
+    SET(CMAKE_C_STANDARD 11)
+    SET(CMAKE_C_STANDARD_REQUIRED ON)
+    #SET(CMAKE_C_EXTENSIONS OFF)
+endif()
 
 
 # Add source files and 3rd-party directory to include directories
@@ -74,8 +106,13 @@ if (COLLABCC_ENABLE_UNITTEST)
 endif()
 
 macro(AddTest testname)
-    add_executable(${testname} ${UNITTEST_COMMON_SOURCE_FILES} "test/${testname}.cpp" ${ARGN})
+    if (COLLABCC_ENABLE_UNITTEST)
+        add_executable(${testname} ${UNITTEST_COMMON_SOURCE_FILES} "test/${testname}.cpp" ${ARGN})
+    else()
+        add_executable(${testname} EXCLUDE_FROM_ALL ${UNITTEST_COMMON_SOURCE_FILES} "test/${testname}.cpp" ${ARGN})
+    endif()
     target_compile_definitions(${testname} PRIVATE -DBUILD_UNITTEST=1)
+    add_dependencies(${testname} collabcc collabccd collabccctl)
     add_test(NAME ${testname} COMMAND ${testname})
 endmacro()
 
