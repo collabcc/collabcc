@@ -165,4 +165,39 @@ static inline typename std::enable_if<
     return value ? "true" : "false";
 }
 
+
+//
+// Detect prefix length of source file path
+//   For example, if this file's path is "/whatever/whatever/src/common/basic.h",
+//   we want to trim the prefix "/whatever/whatever/", and leave "src/common/basic.h" in logging
+//
+namespace common
+{
+    namespace detail
+    {
+        constexpr char PathNormalize(char const ch)
+        {
+            return (ch == '\\') ? '/' : ch;
+        }
+
+        template <uint32_t _FullSize, uint32_t _SuffixSize>
+        constexpr bool IsSuffixEqual(const char (&full)[_FullSize], const char(&suffix)[_SuffixSize], uint32_t const rstart = 1)
+        {
+            static_assert(_SuffixSize <= _FullSize, "Expect: _SuffixSize <= _FullSize");
+            //static_assert(rstart <= _SuffixSize + 1, "Expect: rstart <= _SuffixSize + 1");
+            //static_assert(rstart >= 1, "Expect: rstart >= 1");
+            return (rstart == _SuffixSize + 1) ||
+                   ((PathNormalize(full[_FullSize - rstart]) == PathNormalize(suffix[_SuffixSize - rstart])) &&
+                    IsSuffixEqual(full, suffix, rstart + 1));
+        }
+    }
+
+#define _THIS_FILE_RELATIVE_PATH    ("src/common/basic.h")
+    static_assert(detail::IsSuffixEqual(__FILE__, _THIS_FILE_RELATIVE_PATH), "Expect: IsSuffixEqual");
+    constexpr static uint32_t SourceFilePathPrefixLength = get_array_size(__FILE__) - get_array_size(_THIS_FILE_RELATIVE_PATH);
+#undef _THIS_FILE_RELATIVE_PATH
+
+}  // namespace common
+
+
 #endif // _COLLABCC_COMMON_BASIC_H_INCLUDED_

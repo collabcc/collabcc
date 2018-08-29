@@ -40,19 +40,20 @@ namespace test
 
         std::string const line_str = std::to_string(line);
 
-        concat("[TEST] (", get_str_length("[TEST] ("));
-        concat(file, (uint32_t)strlen(file));
-        concat(":", 1);
+#define _TMP_CONCAT(_Str)  concat((_Str), ::get_str_length(_Str))
+        _TMP_CONCAT("[TEST] (");
+        concat(&file[::common::SourceFilePathPrefixLength], (uint32_t)strlen(file) - ::common::SourceFilePathPrefixLength);
+        _TMP_CONCAT(":");
         concat(line_str.c_str(), (uint32_t)line_str.size());
-        concat(") ", 2);
+        _TMP_CONCAT(") ");
         concat(assertion, (uint32_t)strlen(assertion));
-        concat(". ", 2);
+        _TMP_CONCAT(". ");
 
         if (internal_msgs_count > 0) {
             for (uint32_t i = 0; i < internal_msgs_count; ++i) {
                 concat(internal_msgs[i], (uint32_t)strlen(internal_msgs[i]));
             }
-            concat(". ", 2);
+            _TMP_CONCAT(". ");
         }
 
         if (user_msg) {
@@ -61,17 +62,18 @@ namespace test
             int const msg_len = vsnprintf(buffer + len, ::get_array_size(buffer) - len, user_msg, args);
             if (msg_len < 0) {
                 // Don't know what happened...
-                concat("(?)", 3);
+                _TMP_CONCAT("(?)");
             }
             else if ((uint32_t)msg_len < ::get_array_size(buffer) - len) {
                 len += msg_len;
-                concat(".", 1);
+                _TMP_CONCAT(".");
             }
             else {  // msg_len >= ::get_array_size(buffer) - len
                 len = ::get_array_size(buffer) - 1;
             }
             va_end(args);
         }
+#undef _TMP_CONCAT
 
         buffer[len++] = '\n';
         fwrite(buffer, sizeof(char), len, stderr);
