@@ -1,7 +1,7 @@
 #!/bin/bash
 
 set -e
-source "$(dirname "${BASH_SOURCE[0]}")/ci_common.bashrc"
+source "$(dirname "${BASH_SOURCE[0]}")/common.bashrc"
 set -x
 
 echo "Building..."

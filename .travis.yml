@@ -41,12 +41,12 @@ branches:
     - /^t(e)?mp/
 
 before_script:
-  - ./ci/ci_before_build.bash
+  - ./ci/linux/before_build.bash
 script:
-  - ./ci/ci_build.bash && ./ci/ci_test.bash
+  - ./ci/linux/build.bash && ./ci/linux/test.bash
 deploy:
   - provider: script
-    script: ./ci/ci_deploy.bash
+    script: ./ci/linux/deploy.bash
     #on:
     #  branch: master
 

@@ -7,7 +7,7 @@ known_text_ext = set([
     "c", "C", "cc", "cpp", "cxx",
     "h", "H", "hh", "hpp", "hxx",
     "cu", "cmakein",
-    "sh", "py", "bash", "bashrc",
+    "sh", "py", "bash", "bashrc", "bat",
     "txt", "md",
     "json", "yml", "yaml"
     ])
