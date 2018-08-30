@@ -43,5 +43,5 @@ sudo modprobe tipc
 # Prepare docker container
 echo "Container name: $CONTAINER_NAME"
 (sudo docker stop "$CONTAINER_NAME"; sudo docker rm "$CONTAINER_NAME"; sleep 1) || true
-sudo docker run --privileged --tty --rm --detach --name "$CONTAINER_NAME" "$OS_NAME:$OS_VER" bash
+sudo docker run --privileged --tty --rm --detach --name "$CONTAINER_NAME" "collabccci/$OS_NAME:$OS_VER" bash
 sudo docker cp "$BUILD_ROOT" "$CONTAINER_NAME":"$CONTAINER_BUILD_ROOT"

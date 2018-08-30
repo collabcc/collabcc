@@ -24,9 +24,9 @@ build() {
         g++ --version
         export CC="$(which gcc)"
         export CXX="$(which g++)"
-        mkdir /coopcc-gcc
-        cd /coopcc-gcc
-        cmake -DCMAKE_BUILD_TYPE=Release /coopcc
+        mkdir /collabcc-gcc
+        cd /collabcc-gcc
+        cmake -DCMAKE_BUILD_TYPE=Release /collabcc
         make -j "$NCPU"
         '
 
@@ -61,65 +61,74 @@ build() {
         clang++ --version
         export CC="$(which clang)"
         export CXX="$(which clang++)"
-        mkdir /coopcc-clang
-        cd /coopcc-clang
-        cmake -DCMAKE_BUILD_TYPE=Release /coopcc
+        mkdir /collabcc-clang
+        cd /collabcc-clang
+        cmake -DCMAKE_BUILD_TYPE=Release /collabcc
         make -j "$NCPU"
         '
 }
 
 
-build_on_apt_based() {
-    docker_exec bash -c '
-        set -xe
+#build_on_apt_based() {
+#    docker_exec bash -c '
+#        set -xe
+#
+#        export DEBIAN_FRONTEND=noninteractive
+#        apt-get update -yqq
+#        apt-get install -yqq cmake build-essential clang #libzmq3-dev
+#        '
+#    build
+#}
+#
+#build_on_yum_based() {
+#    docker_exec bash -c '
+#        set -xe
+#
+#        # CentOS systemd issue (on CentOS 7.0 7.1)
+#        # See: https://stackoverflow.com/questions/36630718/docker-as-a-builder-cant-install-systemd-header-files
+#        if [ "$OS_NAME" = "centos" ]; then
+#            yum swap -y fakesystemd systemd || true
+#        fi
+#
+#        # Enable epel source for CentOS
+#        if [ "$OS_NAME" = "centos" ]; then
+#            yum install -y epel-release
+#        fi
+#
+#        yum makecache
+#        yum groupinstall -y "Development tools"
+#        yum install -y wget which cmake clang #zeromq3-devel
+#
+#        if [ "$OS_NAME" = "centos" ]; then
+#            # Install newer gcc/g++ if c++11 not available
+#            echo "int main() { return 0; }" >/tmp/test.cpp
+#            if g++ -o /dev/null /tmp/test.cpp && ! g++ -o /dev/null -std=c++11 /tmp/test.cpp; then
+#                wget http://people.centos.org/tru/devtools-2/devtools-2.repo -O /etc/yum.repos.d/devtools-2.repo
+#                yum install -y devtoolset-2-gcc devtoolset-2-binutils devtoolset-2-gcc-c++
+#            fi
+#            rm -f /tmp/test.cpp
+#        fi
+#        '
+#    build
+#}
 
-        export DEBIAN_FRONTEND=noninteractive
-        apt-get update -yqq
-        apt-get install -yqq cmake build-essential clang #libzmq3-dev
-        '
-    build
-}
-
-build_on_yum_based() {
-    docker_exec bash -c '
-        set -xe
-
-        # CentOS systemd issue (on CentOS 7.0 7.1)
-        # See: https://stackoverflow.com/questions/36630718/docker-as-a-builder-cant-install-systemd-header-files
-        if [ "$OS_NAME" = "centos" ]; then
-            yum swap -y fakesystemd systemd || true
-        fi
-
-        # Enable epel source for CentOS
-        if [ "$OS_NAME" = "centos" ]; then
-            yum install -y epel-release
-        fi
-
-        yum makecache
-        yum groupinstall -y "Development tools"
-        yum install -y wget which cmake clang #zeromq3-devel
-
-        if [ "$OS_NAME" = "centos" ]; then
-            # Install newer gcc/g++ if c++11 not available
-            echo "int main() { return 0; }" >/tmp/test.cpp
-            if g++ -o /dev/null /tmp/test.cpp && ! g++ -o /dev/null -std=c++11 /tmp/test.cpp; then
-                wget http://people.centos.org/tru/devtools-2/devtools-2.repo -O /etc/yum.repos.d/devtools-2.repo
-                yum install -y devtoolset-2-gcc devtoolset-2-binutils devtoolset-2-gcc-c++
-            fi
-            rm -f /tmp/test.cpp
-        fi
-        '
-    build
-}
 
 
+#case "$OS_NAME" in
+#"ubuntu"|"debian"):
+#    build_on_apt_based
+#    ;;
+#"centos"|"fedora"):
+#    build_on_yum_based
+#    ;;
+#*):
+#    echo "Error: Unknown OS_NAME: $OS_NAME"
+#    exit 1
+#esac
 
 case "$OS_NAME" in
-"ubuntu"|"debian"):
-    build_on_apt_based
-    ;;
-"centos"|"fedora"):
-    build_on_yum_based
+"ubuntu"|"debian"|"centos"|"fedora"):
+    build
     ;;
 *):
     echo "Error: Unknown OS_NAME: $OS_NAME"

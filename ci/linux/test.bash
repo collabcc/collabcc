@@ -11,9 +11,9 @@ docker_exec bash -c '
     set -xe
     export CTEST_OUTPUT_ON_FAILURE=1
 
-    cd /coopcc-gcc
+    cd /collabcc-gcc
     make test -j "$NCPU"
 
-    cd /coopcc-clang
+    cd /collabcc-clang
     make test -j "$NCPU"
     '

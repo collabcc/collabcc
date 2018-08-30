@@ -46,8 +46,8 @@ fi
 
 
 # Decide container name
-export CONTAINER_NAME="coopcc_${OS_NAME}_${OS_VER}"
-export CONTAINER_BUILD_ROOT="/coopcc"
+export CONTAINER_NAME="collabcc_${OS_NAME}_${OS_VER}"
+export CONTAINER_BUILD_ROOT="/collabcc"
 docker_exec() {
     sudo docker exec \
         --privileged \
