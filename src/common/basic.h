@@ -5,6 +5,9 @@
 #error "Do not include <common/basic.h> directly. Include <common/common.h> instead."
 #endif // _COLLABCC_COMMON_COMMON_H_INCLUDED_
 
+#include <type_traits>
+#include <array>
+
 
 //
 // tribool from boost
@@ -29,7 +32,6 @@ static inline bool false_or_indeterminate(const tribool& tb) noexcept
 // unwrap
 //   Type unwrapper, expose "origin" type (cv, ref removed)
 //
-#include <type_traits>
 template <typename T>
 struct unwrap {
     typedef T original_type;
@@ -49,6 +51,13 @@ struct unwrap {
 #include <cstdint>
 template <typename T, uint32_t _Size>
 constexpr static inline uint32_t get_array_size(const T(&)[_Size]) noexcept
+{
+    return _Size;
+}
+
+#include <cstdint>
+template <typename T, uint32_t _Size>
+constexpr static inline uint32_t get_array_size(const std::array<T, _Size>&) noexcept
 {
     return _Size;
 }
@@ -120,6 +129,7 @@ struct str_comparer
 template<typename T>
 static inline typename std::enable_if<
     !std::is_same<typename unwrap<T>::type, bool>::value &&
+    !std::is_same<typename unwrap<T>::type, char>::value &&
     (std::is_integral<typename unwrap<T>::type>::value ||
      std::is_floating_point<typename unwrap<T>::type>::value),
 std::string>::type stringify(T&& value)

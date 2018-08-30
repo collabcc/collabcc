@@ -6,6 +6,9 @@
 #endif // _COLLABCC_COMMON_COMMON_H_INCLUDED_
 
 #include <cstdarg>
+#include <cstring>
+#include <cerrno>
+#include <array>
 
 
 namespace common
@@ -23,7 +26,7 @@ namespace common
         const char* const user_msg = nullptr,
         .../*user_msg args*/)
     {
-        char buffer[256];
+        char buffer[1024];
         uint32_t len = 0;  // in range [0, ::get_array_size(buffer) - 1] (except tailing \n)
         auto const concat = [&](const char* const s, uint32_t const len_s) noexcept {
             if (len_s < ::get_array_size(buffer) - len) {
@@ -85,7 +88,8 @@ namespace common
         ++assertion_failure_count;
 #endif
     }
-}
+
+}  // namespace common
 
 
 #define ASSERT(_Expr, ...) \
@@ -117,6 +121,89 @@ namespace common
 #define UNEXPECTED_REACH_HERE(...) \
     (([&]() { \
         ::common::Panic("UNEXPECTED_REACH_HERE: should not reach here", __FILE__, __LINE__, 0, nullptr, ##__VA_ARGS__); \
+    })())
+
+#define CALL_C(_Expr, ...) \
+    (([&]() -> decltype(_Expr) { \
+        auto const ret = (_Expr); \
+        if (ret < 0) { \
+            int const err = errno; \
+            std::string ret_str = ::stringify(ret); \
+            std::string errno_str = ::stringify(err); \
+            const char* const internal_msgs[] = { \
+                #_Expr " returns ", ret_str.c_str(), ", errno = ", errno_str.c_str(), " (", strerror(err), ")", \
+            }; \
+            ::common::Panic("CALL_C(" #_Expr ")", __FILE__, __LINE__, ::get_array_size(internal_msgs), internal_msgs, ##__VA_ARGS__); \
+        } \
+        return ret; \
+    })())
+
+#define CALL_C_EXCEPT(_Expr, _AllowErrs, ...) \
+    (([&]() -> decltype(_Expr) { \
+        auto const ret = (_Expr); \
+        if (ret < 0) { \
+            int const err = errno; \
+            /* _AllowErrs is expected to be surrounded with { } */ \
+            const int allow_errs[] = _AllowErrs; \
+            bool expected = false; \
+            for (size_t ii = 0; ii < ::get_array_size(allow_errs); ++ii) { \
+                if (allow_errs[ii] == err) { \
+                    expected = true; \
+                    break; \
+                } \
+            } \
+            if (!expected) { \
+                std::string ret_str = ::stringify(ret); \
+                std::string errno_str = ::stringify(err); \
+                const char* const internal_msgs[] = { \
+                    #_Expr " returns ", ret_str.c_str(), ", errno = ", errno_str.c_str(), " (", strerror(err), ")", \
+                }; \
+                ::common::Panic("CALL_C_EXCEPT(" #_Expr ", " #_AllowErrs ")", __FILE__, __LINE__, ::get_array_size(internal_msgs), internal_msgs, ##__VA_ARGS__); \
+            } \
+        } \
+        return ret; \
+    })())
+
+#if BOOST_OS_WINDOWS
+#define CALL_WIN(_Expr, ...) \
+    (([&]() -> decltype(_Expr) { \
+        auto const ret = (_Expr); \
+        if (!ret) { \
+            int const err = GetLastError(); \
+            std::string ret_str = ::stringify(ret); \
+            std::string err_str = ::stringify(err); \
+            LPSTR messageBuffer = nullptr; \
+            size_t size = FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, \
+                nullptr, err, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPSTR)&messageBuffer, 0, NULL); \
+            std::string message; \
+            if (size == 0) { \
+                message = "(no message)"; \
+            } \
+            else { \
+                message = std::string(messageBuffer, size); \
+            } \
+            const char* const internal_msgs[] = { \
+                #_Expr " returns ", ret_str.c_str(), ", GetLastError() = ", err_str.c_str(), " (", message.c_str(), ")", \
+            }; \
+            ::common::Panic("CALL_WIN(" #_Expr ")", __FILE__, __LINE__, ::get_array_size(internal_msgs), internal_msgs, ##__VA_ARGS__); \
+        } \
+        return ret; \
+    })())
+#endif  // BOOST_OS_WINDOWS
+
+#define CALL_TRUE(_Expr, ...) \
+    (([&]() -> decltype(_Expr) { \
+        auto const ret = (_Expr); \
+        if (ret < 0) { \
+            int const err = errno; \
+            std::string ret_str = ::stringify(ret); \
+            std::string errno_str = ::stringify(err); \
+            const char* const internal_msgs[] = { \
+                #_Expr " returns ", ret_str.c_str(), ", errno = ", errno_str.c_str(), " (" strerror(errno), ")", \
+            }; \
+            ::common::Panic("CALL_GE0(" #_Expr ")", __FILE__, __LINE__, internal_msgs, ::get_array_size(internal_msgs), ##__VA_ARGS__); \
+        } \
+        return ret; \
     })())
 
 

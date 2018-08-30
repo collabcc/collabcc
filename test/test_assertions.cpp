@@ -81,6 +81,20 @@ void TestAssertionsShouldFail()
     const void* const p2 = &p1;
     SHOULD_FAIL((ASSERT_NOT_NULL(p1)));
     SHOULD_FAIL((ASSERT_IS_NULL(p2)));
+
+#ifndef F_OK
+#define F_OK 0
+#endif
+    SHOULD_FAIL((CALL_C(access("This_File_Does_Not_Exist_EF60AFA0-6BBA-4381-9508-7C8095156612", F_OK))));
+    SHOULD_FAIL((CALL_C_EXCEPT(access("This_File_Does_Not_Exist_EF60AFA0-6BBA-4381-9508-7C8095156612", F_OK), JUST({ EINTR }))));
+    SHOULD_SUCCEED((CALL_C_EXCEPT(access("This_File_Does_Not_Exist_EF60AFA0-6BBA-4381-9508-7C8095156612", F_OK), JUST({ ENOENT }))));
+    SHOULD_SUCCEED((CALL_C_EXCEPT(access("This_File_Does_Not_Exist_EF60AFA0-6BBA-4381-9508-7C8095156612", F_OK), JUST({ EINTR, ENOENT }))));
+
+#if BOOST_OS_WINDOWS
+    SHOULD_FAIL((CALL_WIN(CloseHandle((HANDLE)(uintptr_t)0xdeedbeef))));
+#endif
+
+    std::vector<int> allow_errs ({ 4, 5 });
 }
 
 

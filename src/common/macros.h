@@ -6,6 +6,10 @@
 #endif // _COLLABCC_COMMON_COMMON_H_INCLUDED_
 
 
+// This is to get rid of comma problem in macro substitution
+#define JUST(...)  __VA_ARGS__
+
+
 #if BOOST_COMP_MSVC
 #define CPP_NO_INLINE   __declspec(noinline)
 #elif BOOST_COMP_GNUC
